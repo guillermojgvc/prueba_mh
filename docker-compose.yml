@@ -1,0 +1,21 @@
+version: '3'
+services:
+  db:
+    build:
+      context: ./database
+      dockerfile: dockerfile
+    restart: always
+    environment:
+      MYSQL_DATABASE: myhotel-test
+      MYSQL_USER: user
+      MYSQL_PASSWORD: 123
+      MYSQL_ROOT_PASSWORD: 123456
+    volumes:
+      - ./database/data:/var/lib/mysql
+      - ./database/init:/docker-entrypoint-initdb.d
+    ports:
+      - "3306:3306"
+    # user: "1000:990" #user: "${UID}:${GID}"
+    expose:
+      - "3306"
+  

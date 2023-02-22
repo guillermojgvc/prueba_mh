@@ -1,0 +1,60 @@
+
+-- consulta 1
+SELECT COUNT(*) AS CANTIDAD,  
+CASE WHEN SALARY < 3500 THEN 'SEGMENTO A'
+WHEN SALARY >= 8000 THEN 'SEGMENTO C'
+ELSE 'SEGMENTO B'
+END AS SEGMENTO from employees e
+GROUP BY SEGMENTO
+ORDER BY 2;
+
+-- consulta 2
+SELECT COUNT(*) AS CANTIDAD,  
+CASE WHEN e.SALARY < 3500 THEN 'SEGMENTO A'
+WHEN e.SALARY >= 8000 THEN 'SEGMENTO C'
+ELSE 'SEGMENTO B'
+END AS SEGMENTO, d.DEPARTMENT_NAME from employees e
+left JOIN departments d
+ON d.DEPARTMENT_ID  = e.DEPARTMENT_ID  
+GROUP BY SEGMENTO, d.DEPARTMENT_NAME
+ORDER BY 3,2;
+
+-- consulta 3
+SELECT MAX(e.SALARY) AS MAXIMO,  
+d.DEPARTMENT_NAME  from employees e
+left JOIN departments d
+ON d.DEPARTMENT_ID  = e.DEPARTMENT_ID  
+GROUP BY d.DEPARTMENT_NAME
+ORDER BY 2,1;
+
+-- consulta 4
+SELECT YEAR(FROM_DAYS(DATEDIFF(NOW(),e.HIRE_DATE))) AS ANTIGUEDAD,j.JOB_TITLE,e.FIRST_NAME, e.LAST_NAME,e.EMAIL from employees e
+LEFT JOIN jobs j
+ON e.JOB_ID  = j.JOB_ID 
+WHERE j.JOB_TITLE like '%MANAGER%'
+HAVING ANTIGUEDAD > 15
+
+-- consulta 5
+SELECT AVG(e.SALARY), d.DEPARTMENT_NAME from employees e
+left JOIN departments d
+ON d.DEPARTMENT_ID  = e.DEPARTMENT_ID
+GROUP BY d.DEPARTMENT_ID
+HAVING COUNT(*) > 10;
+
+-- consulta 6
+SELECT DISTINCT  c.COUNTRY_NAME, 
+	COUNT(e.EMPLOYEE_ID) over w as cantidad,
+	AVG(e.SALARY) over w as salario_promedio,
+	MAX(e.SALARY) over w as salario_max,
+	MIN(e.SALARY) over w as salario_min,
+	AVG(YEAR(FROM_DAYS(DATEDIFF(NOW(),e.HIRE_DATE)))) over w as antiguedad_promedio
+from employees e
+left JOIN departments d
+ON d.DEPARTMENT_ID  = e.DEPARTMENT_ID
+left JOIN locations l 
+ON l.LOCATION_ID  = d.LOCATION_ID 
+left JOIN countries c 
+ON c.COUNTRY_ID  = l.COUNTRY_ID
+WINDOW w AS (PARTITION BY c.COUNTRY_NAME);
+
+ 
